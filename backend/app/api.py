@@ -100,16 +100,16 @@ class GetPrediction(Resource):
     def get(self):
         """Get request."""
         id = request.args.get('id', type=str)
-        if id:
-            try:
-                obj = Prediction.objects(_id=id)
-            except Exception as e:
-                return {'Error':'DB Error',
-                        'Description': str(e)}, 500
-            if obj is None:
-                return {'Error', 'Not found'}, 404
-            else:
-                obj = obj.first()
-                return obj.to_mongo(), 200
-        else:
+
+        if not id:
             return {'Error': 'No id'}, 400
+
+        try:
+            obj = Prediction.objects(_id=id).first()
+        except Exception as e:
+            return {'Error': 'DB Error', 'Description': str(e)}, 500
+
+        if not obj:
+            return {'Error': 'Not found'}, 404
+
+        return obj.to_mongo(), 200
